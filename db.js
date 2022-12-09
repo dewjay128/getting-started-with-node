@@ -5,7 +5,7 @@ const pool = new Pool({
   connectionString,
 });
 
-module.exports = function getUsers(searchTerm) {
+function getSuggestions(searchTerm) {
   pool.query(
     `SELECT * FROM artists ORDER BY SIMILARITY(name,'${searchTerm}') DESC LIMIT 5;`,
     (error, results) => {
@@ -15,4 +15,6 @@ module.exports = function getUsers(searchTerm) {
       return results.rows;
     }
   );
-};
+}
+
+module.exports = { getSuggestions };

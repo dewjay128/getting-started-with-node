@@ -4,7 +4,7 @@ const express = require("express");
 const path = require("path");
 const PORT = process.env.PORT || 8080;
 const HOST = process.env.HOST;
-const getSuggestions = require("./server.js");
+const { getSuggestions } = require("./db");
 
 // App
 const app = express();

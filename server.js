@@ -12,7 +12,7 @@ app.get("/", (req, res) => {
   const searchTerm = req.query.search;
   const results = getSuggestions(searchTerm);
 
-  response.status(200).json(results);
+  res.status(200).json(results);
 });
 
 app.listen(PORT, HOST);

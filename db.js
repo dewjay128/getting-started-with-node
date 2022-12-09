@@ -6,7 +6,7 @@ const pool = new Pool({
 });
 
 function getSuggestions(searchTerm) {
-  pool.query(
+  return pool.query(
     `SELECT * FROM artists ORDER BY SIMILARITY(name,'${searchTerm}') DESC LIMIT 5;`,
     (error, results) => {
       if (error) {

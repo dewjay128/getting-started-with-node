@@ -16,7 +16,8 @@
     "cookie-parser": "^1.4.6",
     "express": "^4.18.2",
     "fuzzysort": "^2.0.4",
-    "multer": "^1.4.5-lts.1"
+    "multer": "^1.4.5-lts.1",
+    "pg": "^8.8.0"
   },
   "devDependencies": {
     "nodemon": "^2.0.20"

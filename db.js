@@ -5,16 +5,18 @@ const pool = new Pool({
   connectionString,
 });
 
-function getSuggestions(searchTerm) {
-  return pool.query(
+const getSuggestions = (request, response) => {
+  const searchTerm = request.query.search;
+
+  pool.query(
     `SELECT * FROM artists ORDER BY SIMILARITY(name,'${searchTerm}') DESC LIMIT 5;`,
     (error, results) => {
       if (error) {
         throw error;
       }
-      return results.rows;
+      response.status(200).json(results.rows);
     }
   );
-}
+};
 
 module.exports = { getSuggestions };

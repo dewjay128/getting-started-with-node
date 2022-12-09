@@ -1,7 +1,8 @@
 "use strict";
+const dotenv = require("dotenv");
+dotenv.config();
 
 const express = require("express");
-const path = require("path");
 const PORT = process.env.PORT || 8080;
 const HOST = process.env.HOST;
 const db = require("./db");

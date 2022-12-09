@@ -7,7 +7,6 @@ const pool = new Pool({
 
 const getSuggestions = (request, response) => {
   const searchTerm = request.query.search;
-
   if (searchTerm) {
     pool.query(
       `SELECT * FROM suggestions ORDER BY SIMILARITY(suggestion,'${searchTerm}') DESC LIMIT 5;`,

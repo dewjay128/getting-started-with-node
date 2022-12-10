@@ -9,6 +9,9 @@ const db = require("./db");
 
 // App
 const app = express();
+app.head("/", (req, res) => {
+  return res.sendStatus(200);
+});
 app.get("/", db.getSuggestions);
 
 app.listen(PORT, HOST);

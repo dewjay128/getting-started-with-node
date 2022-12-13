@@ -9,7 +9,7 @@ const getSuggestions = (request, response) => {
   const searchTerm = request.query.search;
   if (searchTerm) {
     pool.query(
-      "SELECT * FROM suggestions ORDER BY SIMILARITY(suggestion,$1) DESC LIMIT 5;",
+      "SELECT suggestion FROM suggestions ORDER BY SIMILARITY(suggestion,$1) DESC LIMIT 5;",
       [searchTerm],
       (error, results) => {
         if (error) {

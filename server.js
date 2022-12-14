@@ -4,6 +4,7 @@ dotenv.config();
 
 const express = require("express");
 const bodyParser = require("body-parser");
+const cors = require("cors");
 const PORT = process.env.PORT || 8080;
 const HOST = process.env.HOST;
 const db = require("./db");
@@ -16,6 +17,11 @@ app.use(
     extended: true,
   })
 );
+
+app.use(cors());
+app.head("/", (req, res) => {
+  return res.sendStatus(200);
+});
 app.get("/", db.getSuggestions);
 app.get("/users", db.getUsers);
 app.post("/users", db.createUser);

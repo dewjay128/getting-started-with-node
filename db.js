@@ -5,6 +5,22 @@ const pool = new Pool({
   connectionString,
 });
 
+const KEYWORD_SEARCH_EVENT = 1;
+
+const saveEvent = (tag, value) => {
+  try {
+    pool.query(
+      "INSERT INTO events (tag, value) VALUES ($1, $2) RETURNING *;",
+      [tag, value],
+      (error, results) => {
+        if (error) {
+          console.log("Couldn't save event");
+        }
+      }
+    );
+  } catch (e) {}
+};
+
 const getSuggestions = (request, response) => {
   const searchTerm = request.query.search;
   if (searchTerm) {
@@ -18,6 +34,7 @@ const getSuggestions = (request, response) => {
         return response.status(200).json(results.rows);
       }
     );
+    saveEvent(KEYWORD_SEARCH_EVENT, searchTerm);
   }
 };
 

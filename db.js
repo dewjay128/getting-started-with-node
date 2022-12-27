@@ -7,11 +7,14 @@ const pool = new Pool({
 
 const KEYWORD_SEARCH_EVENT = 1;
 
-const saveEvent = (tag, value) => {
+const getIp = (req) =>
+  req?.connection?.remoteAddress || req?.ip || req?.ips || "";
+
+const saveEvent = (tag, value, sid) => {
   try {
     pool.query(
-      "INSERT INTO events (tag, value) VALUES ($1, $2) RETURNING *;",
-      [tag, value],
+      "INSERT INTO events (tag, value, sid) VALUES ($1, $2, $3) RETURNING *;",
+      [tag, value, sid],
       (error, results) => {
         if (error) {
           console.log("Couldn't save event");
@@ -34,7 +37,7 @@ const getSuggestions = (request, response) => {
         return response.status(200).json(results.rows);
       }
     );
-    saveEvent(KEYWORD_SEARCH_EVENT, searchTerm);
+    saveEvent(KEYWORD_SEARCH_EVENT, searchTerm, getIp(request));
   }
 };
 

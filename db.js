@@ -7,8 +7,7 @@ const pool = new Pool({
 
 const KEYWORD_SEARCH_EVENT = 1;
 
-const getIp = (req) =>
-  req?.connection?.remoteAddress || req?.ip || req?.ips || "";
+const getIp = (req) => req?.connection?.remoteAddress || req?.ip || "";
 
 const saveEvent = (tag, value, sid) => {
   try {

@@ -24,8 +24,6 @@ app.head("/", (req, res) => {
   return res.sendStatus(200);
 });
 app.get("/", db.getSuggestions);
-app.get("/users", db.getUsers);
-app.post("/users", db.createUser);
 
 app.listen(PORT, HOST);
 console.log(`Running on http://${HOST}:${PORT}`);

@@ -4,28 +4,30 @@ const connectionString = process.env.DATABASE_URL;
 
 const pool = new Pool({
   connectionString,
+  ssl: { rejectUnauthorized: false },
 });
 
 const KEYWORD_SEARCH_EVENT = 1;
 const WRITER_SEARCH_EVENT = 2;
 
-const getMetadata = (request) =>
-  `${
+const getMetadata = (request) => ({
+  ip:
     request?.headers?.["true-client-ip"] ||
     request?.headers?.["x-forwarded-for"] ||
-    ""
-  } - ${request?.headers?.["cf-ipcountry"] || ""} - ${
-    request?.headers?.["cf-ray"] || ""
-  } - ${request?.headers?.["sec-ch-ua-platform"] || ""}`;
+    "",
+  country: request?.headers?.["cf-ipcountry"] || "",
+  cf_ray: request?.headers?.["cf-ray"] || "",
+  device: request?.headers?.["sec-ch-ua-platform"] || "",
+});
 
-const saveEvent = (tag, value, sid) => {
+const saveEvent = (tag, value, ip, country, cf_ray, device) => {
   try {
     pool.query(
-      "INSERT INTO events (tag, value, sid) VALUES ($1, $2, $3) RETURNING *;",
-      [tag, value, sid],
+      "INSERT INTO events (tag, value, ip, country, cf_ray, device) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *;",
+      [tag, value, ip, country, cf_ray, device],
       (error, results) => {
         if (error) {
-          console.log("Couldn't save event");
+          console.log("Couldn't save event", error);
         }
       }
     );
@@ -110,43 +112,32 @@ const getSuggestions = async (request, response) => {
   if (!searchTerm) return response.status(404);
 
   const metadata = getMetadata(request);
-
   const writerSuggestions = await getSuggestionsFromWriter(searchTerm);
 
   if (writerSuggestions) {
-    saveEvent(WRITER_SEARCH_EVENT, searchTerm, metadata);
+    saveEvent(
+      WRITER_SEARCH_EVENT,
+      searchTerm,
+      metadata.ip,
+      metadata.country,
+      metadata.cf_ray,
+      metadata.device
+    );
     return response.status(200).json(writerSuggestions);
   }
 
   const dbSuggestions = await getSuggestionsFromDB(searchTerm);
 
-  saveEvent(KEYWORD_SEARCH_EVENT, searchTerm, metadata);
+  saveEvent(
+    KEYWORD_SEARCH_EVENT,
+    searchTerm,
+    metadata.ip,
+    metadata.country,
+    metadata.cf_ray,
+    metadata.device
+  );
 
   return response.status(200).json(dbSuggestions);
 };
 
-const createUser = (request, response) => {
-  const { email, message } = request.body;
-
-  pool.query(
-    "INSERT INTO users (email, message) VALUES ($1, $2) RETURNING *",
-    [email, message],
-    (error, results) => {
-      if (error) {
-        throw error;
-      }
-      response.status(201).send(`User added with ID: ${results.rows[0].id}`);
-    }
-  );
-};
-
-const getUsers = (request, response) => {
-  pool.query("SELECT * FROM users ORDER BY id ASC", (error, results) => {
-    if (error) {
-      throw error;
-    }
-    response.status(200).json(results.rows);
-  });
-};
-
-module.exports = { getSuggestions, createUser, getUsers };
+module.exports = { getSuggestions };
